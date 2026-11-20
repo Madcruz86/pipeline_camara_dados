@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import os
+import boto3
 
 # URL base para pegar as despesas de um deputado específico (iremos utilizar o 209787)
 URL_INICIAL = "https://dadosabertos.camara.leg.br/api/v2/deputados/209787/despesas?ano=2024&itens=100&formato=json"
@@ -57,3 +58,16 @@ if __name__ == "__main__":
         json.dump(dados, f, ensure_ascii=False, indent=4)
 
     print(f"Dados salvos em {caminho_arquivo}")
+
+    # Upload para o S3
+    print(f"Iniciando o upload para o S3...")
+    s3_client = boto3.client('s3')
+    nome_bucket = 'bucket-pipeline-camara-2024'
+    caminho_s3 = 'raw/despesas/ano=2024/despesas_209787_2024.json'
+
+    try:
+        s3_client.upload_file(caminho_arquivo, nome_bucket, caminho_s3)
+        print(f"Sucesso! Arquivo enviado para o s3://{nome_bucket}/{caminho_s3}")
+    except Exception as e:
+        print(f"Erro no upload: {e}")
+        

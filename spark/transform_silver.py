@@ -8,6 +8,8 @@ spark = (
     .getOrCreate()
 )
 
+print(spark.sparkContext._jvm.org.apache.hadoop.util.VersionInfo.getVersion())
+
 try:
     df_bronze = (
         spark.read
